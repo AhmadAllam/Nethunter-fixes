@@ -1,0 +1,16 @@
+#some command for fix some errors through Android su terminal
+///////////////////////////////////////////////////////
+
+#for fix-symlink copy and past the command below in Android su terminal
+
+ln -sf "$(find /data/local/nhsystem -type d -maxdepth 1  | tail -n 1)" "/data/local/nhsystem/kalifs"
+
+
+///////////////////////////////////////////////////////
+
+#for pam-fix copy and past the command below in Android su terminal
+
+sed -i "s/pam_keyinit.so/pam_keyinit.so #/" /data/local/nhsystem/kalifs/etc/pam.d/*
+
+///////////////////////////////////////////////////////
+
