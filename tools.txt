@@ -26,3 +26,5 @@ zsh-autosuggestions
 zsh-syntax-highlighting
 arp-scan
 dnsutils
+python3-requests
+net-tools
