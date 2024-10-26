@@ -28,3 +28,4 @@ arp-scan
 dnsutils
 python3-requests
 net-tools
+pipx
