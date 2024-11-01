@@ -29,3 +29,6 @@ dnsutils
 python3-requests
 net-tools
 pipx
+tcpdump
+hostapd
+dnsmasq
