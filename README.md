@@ -46,7 +46,7 @@ The script provides various options to address different issues:
    - Repairs errors related to VNC or Kex servers to ensure smooth operation.
 
 5. **Install NetHunter Main Tools:**
-   - Installs essential tools for daily use and runs main scripts or tools. If you wish to add a new tool, please add it to the `tools.txt` file.
+   - Installs essential tools and Python libraries for daily use and runs main scripts or tools. If you wish to add a new tool, please add it to the `tools.txt` file or add your python libraries to `pip.txt` to install it
 
 0. **About & Help:**
    - Displays the main help menu in the terminal.
