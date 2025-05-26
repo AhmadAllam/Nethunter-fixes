@@ -1,0 +1,10 @@
+dnspython
+colorama
+requests
+beautifulsoup4
+scapy
+flask
+tqdm
+PyYAML
+wheel
+

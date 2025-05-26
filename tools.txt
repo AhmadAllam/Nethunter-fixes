@@ -32,3 +32,4 @@ pipx
 tcpdump
 hostapd
 dnsmasq
+dsniff

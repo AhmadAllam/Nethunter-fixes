@@ -1,13 +1,11 @@
 #!/bin/bash
 clear
-#colors
 red="\e[31m"
 green="\e[32m"
 yelo="\e[1;33m"
 cyn="\e[36m"
 nc="\e[0m"
 
-#function_loop
 loopS () {
     for (( i=0; i<${#text}; i++ )); do
         echo -n "${text:$i:1}"
@@ -22,12 +20,11 @@ loopF () {
     done
 }
 
-#function_my cat
 mycat () {
     echo -e "${yelo} "
-    cat << "caty" 
+    cat << "caty"
 ,_     _
- |\\_,-~/
+ |\_,-~/
  / _  _ |    ,--.
 (  @  @ )   / ,-'
  \  _T_/-._( (
@@ -40,14 +37,12 @@ _____________________
 caty
 }
 
-#function_banner
 banner () {
     text="Nethunter Fixing Script by "
     loopS
     printf "${nc}@AhmadAllam${nc}\n"
 }
 
-#function_check termux
 chroot_or_termux () {
     if [ -d "/data/data/com.termux/files/home" ]; then
         echo " "
@@ -56,7 +51,6 @@ chroot_or_termux () {
     fi
 }
 
-#function_menu
 menu () {
     echo ""
     echo ""
@@ -69,11 +63,9 @@ menu () {
     echo -e ""
     echo ""
 
-    #choice
     printf "${yelo}What do you want${nc} : "
     read -p "" entry
 
-    #cases
     case $entry in
         1 | 01)
             clear
@@ -84,19 +76,19 @@ menu () {
             echo -e "${nc} "
             menu
             ;;
-        
+
         2 | 02)
             clear
             fix_apt
             menu
             ;;
-        
+
         3 | 03)
             clear
             check_src
             menu
             ;;
-        
+
         4 | 04)
             clear
             fix_vnc
@@ -106,7 +98,7 @@ menu () {
             echo -e "${nc} "
             menu
             ;;
-        
+
         5 | 05)
             clear
             installing
@@ -116,7 +108,7 @@ menu () {
             echo -e "${nc} "
             menu
             ;;
-        
+
         0 | 00)
             clear
             cols=$(tput cols)
@@ -126,7 +118,7 @@ menu () {
             printf "%*s\n" $(((${#link} + cols) / 2)) "${link}"
             menu
             ;;
-    
+
         *)
             clear
             echo -e "${red} "
@@ -138,7 +130,6 @@ menu () {
     esac
 }
 
-#function_fix internet
 fix_internet () {
     group_inet="inet:x:3003:root"
     group_net_raw="net_raw:x:3004:root"
@@ -146,7 +137,17 @@ fix_internet () {
     group_file="/etc/group"
     apt_conf_file="/etc/apt/apt.conf.d/01-android-nosandbox"
 
-    if grep -q "$group_inet" "$group_file" && grep -q "$group_net_raw" "$group_file" && [ -f "$apt_conf_file" ] && grep -q "$apt_sandbox" "$apt_conf_file"; then
+    local group_file_content
+    group_file_content=$(cat "$group_file" 2>/dev/null)
+
+    local apt_conf_file_content
+    if [ -f "$apt_conf_file" ]; then
+        apt_conf_file_content=$(cat "$apt_conf_file" 2>/dev/null)
+    fi
+
+    if echo "$group_file_content" | grep -q "$group_inet" && \
+       echo "$group_file_content" | grep -q "$group_net_raw" && \
+       echo "$apt_conf_file_content" | grep -q "$apt_sandbox"; then
         text="Internet settings already fixed."
         echo -e "${green} "
         loopF
@@ -155,12 +156,12 @@ fix_internet () {
         groupadd -g 3003 aid_inet 2>/dev/null
         usermod -G nogroup -g aid_inet _apt
         echo "$apt_sandbox" > "$apt_conf_file"
-        
-        if ! grep -q "$group_inet" "$group_file"; then
+
+        if ! echo "$group_file_content" | grep -q "$group_inet"; then
             echo "$group_inet" >> "$group_file"
         fi
 
-        if ! grep -q "$group_net_raw" "$group_file"; then
+        if ! echo "$group_file_content" | grep -q "$group_net_raw"; then
             echo "$group_net_raw" >> "$group_file"
         fi
 
@@ -171,7 +172,6 @@ fix_internet () {
     fi
 }
 
-#function_fix apt
 fix_apt () {
     key_id="7D8D0BF6"
     if apt-key list | grep -q "$key_id"; then
@@ -188,12 +188,14 @@ fix_apt () {
     fi
 }
 
-#function_fix sources
 fix_sources () {
     search_for="deb http://http.kali.org/kali kali-rolling main contrib non-free"
     file="/etc/apt/sources.list"
 
-    if grep -q "$search_for" "$file"; then
+    local file_content
+    file_content=$(cat "$file" 2>/dev/null)
+
+    if echo "$file_content" | grep -q "$search_for"; then
         text="Sources already exist."
         echo -e "${green} "
         loopF
@@ -209,40 +211,59 @@ fix_sources () {
     fi
 }
 
-#function_fix vnc
 fix_vnc () {
     sudo wget -O /root/.vnc/xstartup https://gitlab.com/kalilinux/packages/kali-win-kex/-/raw/kali/master/usr/lib/win-kex/xstartup
     sleep 1
-    apt update && apt -y upgrade && apt -y full-upgrade
+    apt-get update && apt-get -y upgrade && apt-get -y full-upgrade
     sleep 1
-    chmod +x ~~/.vnc/xstartup
+    chmod +x ~/.vnc/xstartup
     chmod +x /home/kali/.vnc/xstartup
     echo " "
 }
 
-#function_installing
 installing () {
-    apt update && apt -y upgrade && apt -y dist-upgrade
+    apt-get update && apt-get -y upgrade && apt-get -y dist-upgrade
+    echo " "
+
+    echo -e "${cyn}Installing Python and pip...${nc}"
+    apt-get -y install python3 python3-pip
+    echo -e "${green}Python and pip installation finished.${nc}"
     echo " "
 
     if [ -f "tools.txt" ]; then
+        echo -e "${cyn}Installing main Nethunter tools...${nc}"
         while IFS= read -r pkg || [ -n "$pkg" ]; do
-            apt -y install "$pkg"
+            apt-get -y install "$pkg"
         done < "tools.txt"
+        echo -e "${green}Main Nethunter tools installation finished.${nc}"
     else
-        echo "File tools.txt not found!"
+        echo -e "${red}File tools.txt not found! Skipping main tools installation.${nc}"
     fi
+    echo " "
 
-    apt -y autoremove
+    if [ -f "pip.txt" ]; then
+        echo -e "${cyn}Installing Python libraries from pip.txt...${nc}"
+        while IFS= read -r lib || [ -n "$lib" ]; do
+            pip install "$lib" --break-system-packages
+        done < "pip.txt"
+        echo -e "${green}Python libraries installation finished.${nc}"
+    else
+        echo -e "${red}File pip.txt not found! Skipping Python libraries installation.${nc}"
+    fi
+    echo " "
+
+    apt-get -y autoremove
     echo " "
 }
 
-#function_Check group file
 check_group () {
     search_for="inet:x:3003:root"
     file="/etc/group"
 
-    if grep -q "$search_for" "$file"; then
+    local file_content
+    file_content=$(cat "$file" 2>/dev/null)
+
+    if echo "$file_content" | grep -q "$search_for"; then
         text="already Fixed bro ;)"
         echo -e "${green} "
         loopF
@@ -253,12 +274,14 @@ check_group () {
     fi
 }
 
-#function_Check source file
 check_src () {
     search_for="deb http://http.kali.org/kali kali-rolling main contrib non-free"
     file="/etc/apt/sources.list"
 
-    if grep -q "$search_for" "$file"; then
+    local file_content
+    file_content=$(cat "$file" 2>/dev/null)
+
+    if echo "$file_content" | grep -q "$search_for"; then
         text="already Fixed bro ;)"
         echo -e "${green} "
         loopF
@@ -269,13 +292,11 @@ check_src () {
     fi
 }
 
-#function_reset
 reset_color() {
-    tput sgr0   # reset attributes
-    tput op     # reset color
+    tput sgr0
+    tput op
 }
 
-#function_goodbye
 goodbye () {
     echo -e "${red} "
     text="thanks & goodbye."
@@ -286,7 +307,6 @@ goodbye () {
 }
 trap goodbye INT
 
-##call functions
 mycat
 banner
 chroot_or_termux
