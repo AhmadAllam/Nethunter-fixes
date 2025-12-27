@@ -54,5 +54,5 @@ The script provides various options to address different issues:
 ## Authors
 
 - **Developer:** Ahmad Allam
-  - Telegram: [@echo_Allam](https://t.me/echo_Allam)
+ - Telegram: [@echo_tester](https://t.me/echo_tester)
   - Remember Palestine ❤️
